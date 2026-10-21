@@ -2,8 +2,10 @@ tts-service/.venv/*
 frontend/node_modules
 backend/my-books-backend
 backend/moyue-server
-# fnos/fpk 打包：预编译二进制不入库（由 fnos/build.sh 交叉编译生成）
+# fnos/fpk 打包：预编译二进制与 .fpk 产物不入库（由 fnos/build.sh 生成）
 fnos/moyue/app/bin/moyue
+*.fpk
+fnos/moyue/*.fpk
 
 # 编译产物（单二进制）
 backend/my-books-backend

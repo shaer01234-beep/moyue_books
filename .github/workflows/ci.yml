@@ -42,3 +42,37 @@ jobs:
       - name: Build backend binary
         working-directory: backend
         run: CGO_ENABLED=0 go build -o moyue-server .
+
+  package-fnos:
+    name: Package fnOS (${{ matrix.arch }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [ amd64, arm64 ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache-dependency-path: backend/go.sum
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      # fnos/build.sh 会：同步版本号 → 构建前端（注入网关前缀）→ 同步到 backend/html/dist
+      # → 交叉编译 Linux/${arch} 单二进制 → 同步 manifest 的 platform 字段。
+      # 此处不传 --pack，仅验证交叉编译与打包目录结构可用（.fpk 产物由发布流程生成）。
+      - name: Package fnOS app dir
+        run: ./fnos/build.sh ${{ matrix.arch }}
+
+      - name: Verify produced binary
+        run: test -x fnos/moyue/app/bin/moyue && file fnos/moyue/app/bin/moyue
