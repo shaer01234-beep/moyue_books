@@ -1,0 +1,36 @@
+tts-service/.venv/*
+frontend/node_modules
+backend/my-books-backend
+backend/moyue-server
+# fpk 打包产物（二进制、应用配置、图标）
+backend/fpk/app/server/moyue-server
+backend/fpk/app/server/config.yaml
+backend/fpk/ICON*.PNG
+
+# 编译产物（单二进制）
+backend/my-books-backend
+backend/moyue-server
+backend/moyues-server
+backend/mybooks-server
+
+# 本地配置文件（示例见 backend/config.yaml.example）
+backend/config.yaml
+# 运行时数据（backend/data 为独立项目数据目录）
+backend/data/moyue.db
+backend/data/jwt_secret
+# 反馈邮箱账号/授权码通过环境变量注入（FEEDBACK_MAIL_ACCOUNT / FEEDBACK_MAIL_AUTH），源码不含真实凭据
+backend/data/uploads/
+
+# 前端构建产物（由 vite build 生成；build.sh 会同步到 backend/html/dist 并内嵌）
+frontend/dist/
+backend/html/dist/
+backend/data/logs/
+frontend/vite.log
+backend/.DS_Store
+backend/data/audiobooks/*
+.DS_Store
+backend/data/moyue.db-shm
+backend/data/moyue.db-wal
+backend/data/tts-models
+server.log
+fnos

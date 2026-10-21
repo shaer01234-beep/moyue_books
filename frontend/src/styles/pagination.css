@@ -1,0 +1,85 @@
+/* ===== 全局分页主题（与弹窗主题一致） ===== */
+.pagination {
+  margin-top: 24px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.pagination .el-pagination {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: #475569;
+  font-weight: 500;
+}
+
+/* 总数 / 每页条数 / 跳转 文字 */
+.pagination .el-pagination__total,
+.pagination .el-pagination__sizes,
+.pagination .el-pagination__jump {
+  color: #64748b;
+  font-size: 13px;
+}
+
+/* 每页条数下拉 + 跳转输入框：圆角 + 主题聚焦 */
+.pagination .el-select .el-input__wrapper,
+.pagination .el-pagination__jump .el-input__wrapper {
+  border-radius: 10px;
+  background: #f8fafc;
+  box-shadow: 0 0 0 1px #e2e8f0 inset;
+  transition: box-shadow 0.2s ease;
+}
+.pagination .el-select .el-input__wrapper.is-focus,
+.pagination .el-pagination__jump .el-input__wrapper.is-focus {
+  box-shadow: 0 0 0 1.5px var(--app-primary, #6366f1),
+    0 4px 14px color-mix(in srgb, var(--app-primary, #6366f1) 18%, transparent);
+}
+
+/* 翻页按钮 / 页码：浅底圆角 */
+.pagination .el-pagination.is-background .btn-prev,
+.pagination .el-pagination.is-background .btn-next,
+.pagination .el-pagination.is-background .el-pager li {
+  background: #f1f5f9;
+  color: #475569;
+  border-radius: 9px;
+  font-weight: 600;
+  min-width: 32px;
+  height: 32px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.pagination .el-pagination.is-background .btn-prev:hover,
+.pagination .el-pagination.is-background .btn-next:hover,
+.pagination .el-pagination.is-background .el-pager li:hover {
+  color: var(--app-primary, #6366f1);
+  background: color-mix(in srgb, var(--app-primary, #6366f1) 12%, #f1f5f9);
+}
+
+/* 当前页：主题渐变 */
+.pagination .el-pagination.is-background .el-pager li.is-active {
+  background: var(--app-gradient, linear-gradient(135deg, #6366f1, #8b5cf6));
+  color: #fff;
+  border: none;
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--app-primary, #6366f1) 30%, transparent);
+}
+.pagination .el-pagination.is-background .el-pager li.is-active:hover {
+  color: #fff;
+}
+
+/* 移动端：分页居中折行，避免挤压 */
+@media (max-width: 768px) {
+  .pagination {
+    justify-content: center;
+  }
+  .pagination .el-pagination {
+    justify-content: center;
+    row-gap: 8px;
+  }
+  .pagination .el-pagination.is-background .btn-prev,
+  .pagination .el-pagination.is-background .btn-next,
+  .pagination .el-pagination.is-background .el-pager li {
+    min-width: 28px;
+    font-size: 13px;
+    height: 28px;
+  }
+}

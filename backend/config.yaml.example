@@ -1,0 +1,52 @@
+# ============================================================
+# 个人图书管理系统 - 后端配置文件
+# ============================================================
+# 配置文件查找顺序（按优先级）：
+#   1. 环境变量 MB_CONFIG 指定的路径
+#   2. $TRIM_PKGETC/config.yaml （飞牛 fpk 静态配置目录 etc/，只读）
+#   3. /app/config/config.yaml （兼容旧 fpk 约定）
+#   4. backend/config.yaml （backend 项目根，独立开发/调试/打包时默认读取）
+#
+# 所有配置项均可被同名环境变量覆盖：
+#   MB_DATA_DIR / MB_UPLOAD_DIR / MB_DB_PATH / MB_JWT_SECRET / PORT
+#
+# 飞牛 fpk 目录约定（详见 README 第 5 节）：
+#   TRIM_APPDEST   程序目录（target/），单二进制 moyue-server
+#   TRIM_PKGVAR    运行时数据目录（var/），数据库/JWT 密钥默认存放于此，卸载保留
+#   TRIM_PKGETC    静态配置目录（etc/），config.yaml 默认放置于此
+#   TRIM_APPSHARE  用户共享数据（shares/），上传文件默认存放于 $TRIM_APPSHARE/uploads，
+#                  用户可在飞牛"文件管理"中直接访问
+# ============================================================
+
+server:
+  # 服务监听端口（可用环境变量 PORT 覆盖）
+  port: 18080
+  # 运行日志级别：debug / info / warn / error
+  # 日志同时输出到控制台与 <data_dir>/logs/moyue.log（默认 20MB 自动轮转，保留最近 3 份），
+  # 用于排查问题；访问日志 5xx=error、4xx=warn、其余=info（静态资源/书籍资源等高频请求不记录）
+  log_level: info
+
+data:
+  # 数据目录：存放数据库、JWT 密钥（上传文件见 upload_dir）。
+  # 默认值：$TRIM_PKGVAR > /app/data（旧 fpk）> backend/data（backend 项目根）
+  data_dir: ""
+
+  # 上传目录（图书文件与封面），默认 <data_dir>/uploads；
+  # 飞牛 fpk 环境默认 $TRIM_APPSHARE/uploads（用户可在"文件管理"直接访问）
+  upload_dir: ""
+
+  # SQLite 数据库文件路径，默认 <data_dir>/moyue.db
+  db_path: ""
+
+  # JWT 签名密钥文件路径，默认 <data_dir>/jwt_secret
+  jwt_secret_path: ""
+
+# ============================================================
+# 问题反馈（设置页 - 问题反馈）
+# 注意：本应用不在此文件配置邮箱！反馈邮件通道所需的 163 SMTP 账号与授权码
+# 通过环境变量注入（源码中不含任何真实凭据）：
+#   FEEDBACK_MAIL_ACCOUNT  发件 / 收件 163 邮箱账号
+#   FEEDBACK_MAIL_AUTH     163 SMTP 授权码（非登录密码）
+# 未配置时反馈邮件通道自动禁用，不影响其他功能。
+# 使用者只需在设置页填写反馈内容与联系方式，提交即自动发送至开发者邮箱。
+# ============================================================

@@ -1,0 +1,232 @@
+/* ===== 统一弹窗：.detail-dialog（与 AudioPlaylist 风格保持一致） =====
+   由 BaseDialog 及有声书/详情/书架等页面的 el-dialog 共用，需全局常驻加载。
+   主题变量（--app-primary / --app-gradient）由 utils/appPrefs.js 在运行时注入。 */
+
+.detail-dialog-modal.el-overlay {
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(12px) saturate(110%);
+  -webkit-backdrop-filter: blur(12px) saturate(110%);
+}
+
+/* class="detail-dialog" 直接落在 .el-dialog 盒子上（同元素） */
+.detail-dialog.el-dialog {
+  --dlg-radius: 24px;
+  border-radius: var(--dlg-radius);
+  overflow: hidden;
+  background: #fff;
+  border: none;
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.35);
+  animation: dlg-pop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes dlg-pop {
+  from { transform: scale(0.94) translateY(14px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* 头部：白底 + 浅灰底边，与 AudioPlaylist 面板统一 */
+.detail-dialog .el-dialog__header {
+  position: relative;
+  margin-right: 0;
+  padding: 20px;
+  background: #fff;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* 自定义头：图标 + 标题 + 副标题 */
+.detail-dialog .dlg-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  padding-right: 48px;
+}
+.detail-dialog .dlg-head-ic {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: var(--app-gradient, linear-gradient(135deg, #6366f1, #8b5cf6));
+  font-size: 20px;
+}
+.detail-dialog .dlg-head-ic .el-icon {
+  font-size: 20px;
+}
+.detail-dialog .dlg-head-main {
+  flex: 1;
+  min-width: 0;
+}
+.detail-dialog .dlg-head-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.detail-dialog .dlg-head-sub {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 关闭按钮：与 AudioPlaylist 一致 */
+.detail-dialog .el-dialog__headerbtn {
+  top: 20px;
+  right: 20px;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #f1f5f9;
+  border: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.detail-dialog .el-dialog__headerbtn .el-dialog__close {
+  color: #64748b;
+  font-size: 18px;
+}
+.detail-dialog .el-dialog__headerbtn:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+.detail-dialog .el-dialog__headerbtn:hover .el-dialog__close {
+  color: #ef4444;
+}
+
+/* 主体 */
+.detail-dialog .el-dialog__body {
+  padding: 20px;
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+  color: #475569;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
+.detail-dialog .el-dialog__body::-webkit-scrollbar {
+  width: 6px;
+}
+.detail-dialog .el-dialog__body::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 6px;
+}
+
+/* 底部 */
+.detail-dialog .el-dialog__footer {
+  padding: 0 20px 14px;
+  text-align: right;
+}
+
+/* 表单：与 AudioPlaylist 同色系 */
+.detail-dialog .el-form-item {
+  margin-bottom: 18px;
+}
+.detail-dialog .el-form-item:last-child {
+  margin-bottom: 0;
+}
+.detail-dialog .el-form-item__label {
+  color: #475569;
+  font-weight: 500;
+  font-size: 14px;
+  padding-bottom: 6px;
+  line-height: 1.4;
+}
+
+.detail-dialog .el-input__wrapper:not(.is-error),
+.detail-dialog .el-textarea__inner:not(.is-error) {
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px #e2e8f0 inset;
+  background: #f8fafc;
+  transition: box-shadow 0.2s ease, background 0.2s ease;
+}
+.detail-dialog .el-input__wrapper:not(.is-error):hover,
+.detail-dialog .el-textarea__inner:not(.is-error):hover {
+  background: #fff;
+  box-shadow: 0 0 0 1px #cbd5e1 inset;
+}
+.detail-dialog .el-input__wrapper.is-focus:not(.is-error),
+.detail-dialog .el-textarea__inner:focus:not(.is-error) {
+  background: #fff;
+  box-shadow: 0 0 0 1px var(--app-primary) inset;
+}
+.detail-dialog .el-input__inner,
+.detail-dialog .el-textarea__inner {
+  color: #1e293b;
+}
+.detail-dialog .el-input__inner::placeholder,
+.detail-dialog .el-textarea__inner::placeholder {
+  color: #94a3b8;
+}
+
+/* 统一弹窗内按钮圆角 */
+.detail-dialog .el-button {
+  border-radius: 10px;
+}
+
+/* 主按钮：主题渐变，hover 微浮起 */
+.detail-dialog .el-button--primary {
+  background: var(--app-gradient, linear-gradient(135deg, #6366f1, #8b5cf6));
+  border: none;
+  box-shadow: none;
+  transition: transform 0.18s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+.detail-dialog .el-button--primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--app-primary, #6366f1) 30%, transparent);
+}
+.detail-dialog .el-button--primary:active {
+  transform: translateY(0);
+}
+
+/* 次要按钮（仅默认/无类型）：浅灰描边，不影响 danger/success 等彩色按钮 */
+.detail-dialog .el-button.el-button--default {
+  border-color: #e2e8f0;
+  color: #64748b;
+}
+.detail-dialog .el-button.el-button--default:hover {
+  color: #334155;
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+@media (max-width: 640px) {
+  .detail-dialog.el-dialog {
+    width: calc(100% - 24px) !important;
+    max-width: 100%;
+    border-radius: 20px;
+  }
+  .detail-dialog .el-dialog__header {
+    padding: 16px;
+  }
+  .detail-dialog .el-dialog__body {
+    padding: 16px;
+  }
+  .detail-dialog .el-dialog__footer {
+    padding: 0 16px 12px;
+  }
+  .detail-dialog .dlg-head {
+    padding-right: 44px;
+    gap: 12px;
+  }
+  .detail-dialog .dlg-head-ic {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    font-size: 18px;
+  }
+  .detail-dialog .dlg-head-title {
+    font-size: 15px;
+  }
+  .detail-dialog .el-dialog__headerbtn {
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+  }
+}
