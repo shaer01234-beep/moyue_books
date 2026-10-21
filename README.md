@@ -47,7 +47,7 @@
 | 后端 | Go、Gin、GORM、glebarez/sqlite（纯 Go SQLite）、difyz9/edge-tts-go |
 | 前端 | Vue 3、Element Plus、Vite、Axios、foliate-js、pdfjs-dist |
 | 数据库 | SQLite（零配置，本地文件存储） |
-| 部署 | 单二进制（前端经 `go:embed` 内嵌），支持飞牛 fnOS 打包 |
+| 部署 | 单二进制（前端经 `go:embed` 内嵌），支持 Docker 容器与飞牛 fnOS 打包 |
 
 ## 目录结构
 
@@ -146,6 +146,23 @@ CGO_ENABLED=1 go build -o moyue-server .
 ```
 
 或直接用 `start.sh` 一键启动后端与前端开发服务器（热更新，前端运行在 `http://localhost:3000`，已配置代理到后端 API）。
+
+### Docker 部署
+
+使用多阶段构建，将前端内嵌进 Go 单二进制后打包为轻量镜像（基于 `alpine`，非 root 用户运行，暴露 `18080`）：
+
+```bash
+# 方式一：docker compose（数据持久化到宿主机 ./data）
+docker compose up -d --build
+
+# 方式二：纯 Docker
+docker build -t moyue-books .
+docker run -d -p 18080:18080 -v "$(pwd)/data:/app/data" moyue-books
+```
+
+- 数据目录（数据库、JWT 密钥、上传文件）挂载到容器 `/app/data`，对应宿主机 `./data`；升级只需重建镜像并保留该卷即可。
+- 可用环境变量：`MB_DATA_DIR`、`PORT`、`EDGE_TTS_PROXY` / `HTTPS_PROXY`、`FEEDBACK_MAIL_ACCOUNT` / `FEEDBACK_MAIL_AUTH`（详见「配置说明」）。
+- `.dockerignore` 已排除 `node_modules`、`frontend/dist`、`backend/html/dist`、`backend/data` 等，避免把本地产物与用户数据送进构建上下文。
 
 ### 飞牛 fnOS（fnpk）部署
 

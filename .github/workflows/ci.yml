@@ -76,3 +76,14 @@ jobs:
 
       - name: Verify produced binary
         run: test -x fnos/moyue/app/bin/moyue && file fnos/moyue/app/bin/moyue
+
+  docker-build:
+    name: Docker image build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build image
+        # 仅验证镜像可构建（不推送）；多阶段构建内含前端 + 后端编译
+        run: docker build -t moyue-books:ci .

@@ -1,0 +1,19 @@
+# 构建上下文排除项（加速 docker build，避免把本地产物/数据送进构建）
+.git
+.github
+node_modules
+frontend/node_modules
+frontend/dist
+backend/html/dist
+backend/data
+fnos/moyue/app/bin
+*.fpk
+*.db
+*.db-shm
+*.db-wal
+server.log
+.DS_Store
+README.md
+LICENSE
+CONTRIBUTING.md
+docs

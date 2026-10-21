@@ -1,0 +1,19 @@
+services:
+  moyue:
+    build: .
+    image: moyue-books:latest
+    container_name: moyue-books
+    ports:
+      - "18080:18080"
+    environment:
+      MB_DATA_DIR: /app/data
+      PORT: "18080"
+      # 受限网络下 Edge TTS 代理出网（二选一）
+      # EDGE_TTS_PROXY: "http://host.docker.internal:7890"
+      # HTTPS_PROXY: "http://host.docker.internal:7890"
+      # 问题反馈邮件通道（未配置则自动禁用）
+      # FEEDBACK_MAIL_ACCOUNT: "yourname@163.com"
+      # FEEDBACK_MAIL_AUTH: "your_smtp_auth_code"
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
