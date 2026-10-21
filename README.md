@@ -8,17 +8,19 @@
 
 ## 项目截图
 
-| 书架 | 在线阅读器 |
-|------|------------|
-| ![书架](docs/screenshots/bookshelf.png) | ![在线阅读器](docs/screenshots/reader.png) |
-| 导入与编辑 | 设置 |
-| ![导入与编辑](docs/screenshots/edit.png) | ![设置](docs/screenshots/settings.png) |
+| 书架                                       | 在线阅读器                                 |
+| ------------------------------------------ | ------------------------------------------ |
+| ![书架](docs/screenshots/书架.png)         | ![在线阅读器](docs/screenshots/划线.png)   |
+| 导入与编辑                                 | 设置                                       |
+| ![导入与编辑](docs/screenshots/媒体库.png) | ![有声书](docs/screenshots/有声书.png)     |
+| 有声阅读                                   | 阅读统计                                   |
+| ![有声阅读](docs/screenshots/阅读页.png)   | ![阅读统计](docs/screenshots/阅读统计.png) |
 
 > 截图请放置于 `docs/screenshots/`（建议 PNG 格式，宽度约 1200px）。未提供时上方为占位链接，提交图片后将自动渲染。
 
 ## 功能特性
 
-### 已实现（P0 核心）
+### 已实现（核心）
 
 - **图书上传**：支持拖拽上传、批量导入。
 - **格式支持**：EPUB、KEPUB、MOBI、AZW3、AZW、PDF、CBZ、CBR、M4B、MP3，以及 Markdown（`.md`）/ 纯文本（`.txt`）。后两类在上传或扫描时自动转为 EPUB，按一级标题拆分为多章节，并自动生成主题色封面。
@@ -28,26 +30,16 @@
 - **在线阅读器**：EPUB 阅读，目录导航、翻页、进度条、阅读偏好设置。
 - **阅读进度保存**：自动保存当前章节与百分比进度。
 - **阅读统计**：藏书总数、正在阅读、已读完、总页数。
-
-### 规划中（P1 / P2）
-
-- [ ] 划线、批注功能
-- [ ] 收藏夹管理
-- [ ] 高级搜索与筛选
-- [ ] 导出 / 导入备份
-- [ ] PDF 在线阅读
-- [ ] 在线元数据获取（豆瓣、Google Books）
-- [ ] 阅读统计与年度报告
-- [ ] 移动端适配优化、云同步
+- **阅读划线**：划线、批注功能
 
 ## 技术栈
 
-| 层级 | 技术 |
-|------|------|
-| 后端 | Go、Gin、GORM、glebarez/sqlite（纯 Go SQLite）、difyz9/edge-tts-go |
-| 前端 | Vue 3、Element Plus、Vite、Axios、foliate-js、pdfjs-dist |
-| 数据库 | SQLite（零配置，本地文件存储） |
-| 部署 | 单二进制（前端经 `go:embed` 内嵌），支持 Docker 容器与飞牛 fnOS 打包 |
+| 层级   | 技术                                                                   |
+| ------ | ---------------------------------------------------------------------- |
+| 后端   | Go、Gin、GORM、glebarez/sqlite（纯 Go SQLite）、difyz9/edge-tts-go     |
+| 前端   | Vue 3、Element Plus、Vite、Axios、foliate-js、pdfjs-dist               |
+| 数据库 | SQLite（零配置，本地文件存储）                                         |
+| 部署   | 单二进制（前端经 `go:embed` 内嵌），支持 Docker 容器与飞牛 fnOS 打包 |
 
 ## 目录结构
 
@@ -168,12 +160,12 @@ docker run -d -p 18080:18080 -v "$(pwd)/data:/app/data" moyue-books
 
 仓库已包含飞牛打包骨架（`fnos/`），提供 `fnos/build.sh` 一键交叉编译并打包 `.fpk`，详见 `fnos/moyue/README.md`。后端按飞牛 fpk 应用的目录约定设计，打包为 fpk 应用时无需修改代码。路径与环境变量约定如下：
 
-| 内容 | 环境变量 | 说明 |
-|------|----------|------|
-| 程序（单二进制，前端已内嵌） | `TRIM_APPDEST` | `moyue-server` |
-| 静态配置（只读） | `TRIM_PKGETC` | 放置 `config.yaml`，自动读取 |
-| 运行时数据（持久化，卸载保留） | `TRIM_PKGVAR` | 数据库 `moyue.db`、JWT 密钥存放于此 |
-| 用户共享数据 | `TRIM_APPSHARE` | 上传文件默认存放于 `$TRIM_APPSHARE/uploads` |
+| 内容                           | 环境变量          | 说明                                          |
+| ------------------------------ | ----------------- | --------------------------------------------- |
+| 程序（单二进制，前端已内嵌）   | `TRIM_APPDEST`  | `moyue-server`                              |
+| 静态配置（只读）               | `TRIM_PKGETC`   | 放置 `config.yaml`，自动读取                |
+| 运行时数据（持久化，卸载保留） | `TRIM_PKGVAR`   | 数据库 `moyue.db`、JWT 密钥存放于此         |
+| 用户共享数据                   | `TRIM_APPSHARE` | 上传文件默认存放于 `$TRIM_APPSHARE/uploads` |
 
 用户可在飞牛「应用管理」中修改服务端口，系统以 `TRIM_SERVICE_PORT` 注入并自动生效（优先级：`TRIM_SERVICE_PORT` > `PORT` > 配置文件 > 18080）。
 
@@ -198,20 +190,21 @@ docker run -d -p 18080:18080 -v "$(pwd)/data:/app/data" moyue-books
 
 除 `config.yaml` 外，以下环境变量均可覆盖对应配置：
 
-| 环境变量 | 作用 |
-|----------|------|
-| `MB_CONFIG` | 指定配置文件路径（最高优先级） |
-| `MB_DATA_DIR` | 数据目录 |
-| `MB_UPLOAD_DIR` | 上传目录 |
-| `MB_DB_PATH` | 数据库文件路径 |
-| `MB_JWT_SECRET` | JWT 签名密钥（环境变量优先于密钥文件） |
-| `PORT` | 服务监听端口 |
-| `EDGE_TTS_PROXY` | Edge TTS 代理地址（受限网络出网用） |
-| `HTTPS_PROXY` | 通用 HTTPS 代理（Edge TTS 亦可经此出网） |
-| `FEEDBACK_MAIL_ACCOUNT` | 反馈邮件通道的 163 邮箱账号 |
-| `FEEDBACK_MAIL_AUTH` | 反馈邮件通道的 163 SMTP 授权码 |
+| 环境变量                  | 作用                                     |
+| ------------------------- | ---------------------------------------- |
+| `MB_CONFIG`             | 指定配置文件路径（最高优先级）           |
+| `MB_DATA_DIR`           | 数据目录                                 |
+| `MB_UPLOAD_DIR`         | 上传目录                                 |
+| `MB_DB_PATH`            | 数据库文件路径                           |
+| `MB_JWT_SECRET`         | JWT 签名密钥（环境变量优先于密钥文件）   |
+| `PORT`                  | 服务监听端口                             |
+| `EDGE_TTS_PROXY`        | Edge TTS 代理地址（受限网络出网用）      |
+| `HTTPS_PROXY`           | 通用 HTTPS 代理（Edge TTS 亦可经此出网） |
+| `FEEDBACK_MAIL_ACCOUNT` | 反馈邮件通道的 163 邮箱账号              |
+| `FEEDBACK_MAIL_AUTH`    | 反馈邮件通道的 163 SMTP 授权码           |
 
 路径解析优先级：
+
 - 配置路径：`MB_CONFIG` > `$TRIM_PKGETC/config.yaml` > `/app/config/config.yaml` > `backend/config.yaml`
 - 数据目录：`MB_DATA_DIR` > 配置文件 `data_dir` > `$TRIM_PKGVAR` > `/app/data` > `backend/data`
 - 上传目录：`MB_UPLOAD_DIR` > 配置文件 `upload_dir` > `$TRIM_APPSHARE/uploads`（飞牛环境）> `数据目录/uploads`
@@ -221,40 +214,44 @@ docker run -d -p 18080:18080 -v "$(pwd)/data:/app/data" moyue-books
 
 ## API 接口
 
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| GET | `/api/books` | 图书列表（支持分页、搜索、排序） |
-| POST | `/api/books` | 单本上传（multipart/form-data） |
-| POST | `/api/books/batch` | 批量上传 |
-| GET | `/api/books/:id` | 图书详情 |
-| PUT | `/api/books/:id` | 更新图书信息 |
-| DELETE | `/api/books/:id` | 删除图书 |
-| GET | `/api/books/:id/cover` | 获取封面 |
-| POST | `/api/books/:id/cover` | 上传 / 更换封面 |
-| PUT | `/api/books/:id/progress` | 更新阅读进度 |
-| GET | `/api/books/:id/content` | 获取 EPUB 目录 / 章节内容 |
-| GET | `/api/books/:id/download` | 下载原文件 |
-| GET | `/api/stats` | 统计信息 |
+| 方法   | 路径                        | 说明                             |
+| ------ | --------------------------- | -------------------------------- |
+| GET    | `/api/books`              | 图书列表（支持分页、搜索、排序） |
+| POST   | `/api/books`              | 单本上传（multipart/form-data）  |
+| POST   | `/api/books/batch`        | 批量上传                         |
+| GET    | `/api/books/:id`          | 图书详情                         |
+| PUT    | `/api/books/:id`          | 更新图书信息                     |
+| DELETE | `/api/books/:id`          | 删除图书                         |
+| GET    | `/api/books/:id/cover`    | 获取封面                         |
+| POST   | `/api/books/:id/cover`    | 上传 / 更换封面                  |
+| PUT    | `/api/books/:id/progress` | 更新阅读进度                     |
+| GET    | `/api/books/:id/content`  | 获取 EPUB 目录 / 章节内容        |
+| GET    | `/api/books/:id/download` | 下载原文件                       |
+| GET    | `/api/stats`              | 统计信息                         |
 
 ## 使用说明
 
 ### 导入图书
+
 1. 点击左侧导航栏「导入图书」。
 2. 拖拽文件到上传区域，或点击选择文件（支持批量）。
 3. 系统会自动提取 EPUB 元数据（书名、作者、出版社等）。
 
 ### 浏览书架
+
 1. 点击「书架」进入图书列表。
 2. 切换网格 / 列表视图。
 3. 支持按时间、书名、最近阅读排序；顶部搜索栏可按书名 / 作者搜索。
 
 ### 阅读图书
+
 1. 点击图书卡片或「阅读」按钮进入阅读器。
 2. 点击屏幕左右边缘或按键盘 ← → 翻页。
 3. 点击「目录」打开章节导航；点击「设置」调整字体、字号、行距、主题。
 4. 退出时自动保存阅读进度。
 
 ### 编辑图书信息
+
 1. 在书架或详情页点击「编辑」。
 2. 修改书名、作者（逗号分隔）、出版社、描述、标签。
 3. 支持更换封面图片。
