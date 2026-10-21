@@ -6,6 +6,16 @@
 
 > 本项目以 **MIT 协议** 开源，欢迎 Fork、自部署与二次开发。详见 [LICENSE](LICENSE) 与 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
+## 项目截图
+
+| 书架 | 在线阅读器 |
+|------|------------|
+| ![书架](docs/screenshots/bookshelf.png) | ![在线阅读器](docs/screenshots/reader.png) |
+| 导入与编辑 | 设置 |
+| ![导入与编辑](docs/screenshots/edit.png) | ![设置](docs/screenshots/settings.png) |
+
+> 截图请放置于 `docs/screenshots/`（建议 PNG 格式，宽度约 1200px）。未提供时上方为占位链接，提交图片后将自动渲染。
+
 ## 功能特性
 
 ### 已实现（P0 核心）
