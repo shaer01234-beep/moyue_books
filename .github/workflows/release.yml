@@ -1,0 +1,88 @@
+name: Release
+
+# 发布流程：打 tag（v*）或手动触发后，交叉编译并打包各架构飞牛 .fpk，
+# 再汇总上传到 GitHub Release。.fpk 为本地生成产物，已在 .gitignore 中排除。
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '发布版本号（不含 v，例如 1.0.2）；留空则用 manifest 版本'
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  build-fpk:
+    name: Build .fpk (${{ matrix.arch }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [ amd64, arm64 ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache-dependency-path: backend/go.sum
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      # 让 .fpk 版本号与发布版本一致：优先 workflow_dispatch 输入的 version，
+      # 其次 tag（去掉 v 前缀），否则沿用 manifest 中的 version。
+      - name: Sync manifest version
+        run: |
+          VER=""
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then VER="${GITHUB_REF_NAME#v}"; fi
+          if [ -n "${{ github.event.inputs.version }}" ]; then VER="${{ github.event.inputs.version }}"; fi
+          if [ -n "$VER" ]; then
+            sed -i.bak -E "s|^version .*|version              = ${VER}|" fnos/moyue/manifest \
+              && rm -f fnos/moyue/manifest.bak
+            echo "manifest version -> ${VER}"
+          fi
+
+      # --pack 会生成 fnos/moyue/moyue_<version>_<platform>.fpk
+      - name: Build & pack fnOS app (${{ matrix.arch }})
+        run: ./fnos/build.sh ${{ matrix.arch }} --pack
+
+      - name: Upload .fpk artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fpk-${{ matrix.arch }}
+          path: fnos/moyue/*.fpk
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub Release
+    needs: build-fpk
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all .fpk artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: List assets
+        run: ls -lh artifacts
+
+      - name: Create release and upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*.fpk
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
