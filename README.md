@@ -160,6 +160,23 @@ CGO_ENABLED=1 go build -o moyue-server .
 
 用户可在飞牛「应用管理」中修改服务端口，系统以 `TRIM_SERVICE_PORT` 注入并自动生效（优先级：`TRIM_SERVICE_PORT` > `PORT` > 配置文件 > 18080）。
 
+#### 发布（自动构建 .fpk）
+
+本项目已配置 GitHub Actions 发布流程（`.github/workflows/release.yml`）。打版本 tag 并推送即可自动交叉编译并打包各架构 `.fpk`，并上传到 GitHub Release：
+
+- **触发**：推送 `v*` tag（如 `v1.0.2`），或在 Actions 页面手动触发 `Release` 工作流（可填版本号）。
+- **产物**：`amd64`（x86）、`arm64`（arm）两个架构的 `moyue_<version>_<platform>.fpk`。
+- **版本号**：自动与 tag 对齐（手动触发时可用输入覆盖），并同步进 `fnos/moyue/manifest` 与前端 `APP_VERSION`。
+
+本地手动打包（不发布）示例：
+
+```bash
+./fnos/build.sh                 # 构建 arm64 应用目录（默认）
+./fnos/build.sh amd64 --pack    # 构建 x86_64 并生成 .fpk
+```
+
+详细打包参数见 `fnos/moyue/README.md`。
+
 ## 配置说明
 
 除 `config.yaml` 外，以下环境变量均可覆盖对应配置：
