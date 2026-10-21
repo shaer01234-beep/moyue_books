@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 安全漏洞反馈（请勿公开披露）
+    url: https://github.com/OWNER/REPO/security/advisories/new
+    about: 发现安全漏洞时，请通过私有安全通告提交，不要创建公开 Issue。
