@@ -1,0 +1,26 @@
+#!/bin/bash
+# 安装后：持久化安装向导选择的端口，并同步桌面入口
+# 桌面端口替换逻辑与 onvif 一致（固定路径覆盖飞牛实际使用的 ui/config）
+set -u
+
+PKG_VAR="${TRIM_PKGVAR}"
+APP_DEST="${TRIM_APPDEST}"
+PORT_FILE="${PKG_VAR}/port.conf"
+# 端口：安装向导可自定义，未填则用 manifest 的 service_port（默认 18080）
+PORT="${wizard_port:-${TRIM_SERVICE_PORT:-18080}}"
+
+case "$PORT" in
+  ''|*[!0-9]*) PORT="18080";;
+esac
+
+echo "${PORT}" > "${PORT_FILE}" 2>/dev/null || true
+
+# 桌面入口端口同步：与 onvif 一致，用固定路径覆盖飞牛实际使用的 ui/config，
+# 替换 ${wizard_port} 占位符（旧写法）与固定端口两种形式，确保桌面入口拿到真实端口
+for f in "${TRIM_APPDEST}/ui/config" "${TRIM_APPDEST}/app/ui/config" "/var/apps/${TRIM_APPNAME:-moyue}/ui/config"; do
+  [ -f "$f" ] || continue
+  sed -E -i.bak -e 's|\$\{wizard_port\}|'"${PORT}"'|g' \
+                -e 's|"port": *"[0-9]+"|"port": "'"${PORT}"'"|g' "$f" && rm -f "$f.bak"
+done
+
+exit 0

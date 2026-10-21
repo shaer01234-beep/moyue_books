@@ -1,0 +1,28 @@
+{
+    "data-share":
+    {
+        "shares":
+        [
+            {
+                "name": "moyue",
+                "permission":
+                {
+                    "rw":
+                    [
+                        "moyue"
+                    ]
+                }
+            },
+            {
+                "name": "moyue/data",
+                "permission":
+                {
+                    "rw":
+                    [
+                        "moyue"
+                    ]
+                }
+            }
+        ]
+    }
+}

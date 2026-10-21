@@ -1,0 +1,15 @@
+{
+    ".url": {
+        "moyue.Application": {
+            "title": "墨阅",
+            "icon": "images/icon_{0}.png",
+            "type": "url",
+            "protocol": "http",
+            "port": "${wizard_port}",
+            "gatewaySocket": "moyue.sock",
+            "gatewayPrefix": "/app/moyue",
+            "url": "/app/moyue",
+            "allUsers": false
+        }
+    }
+}

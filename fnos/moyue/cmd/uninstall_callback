@@ -1,0 +1,18 @@
+#!/bin/bash
+# 卸载后清理：若用户在卸载向导中选择了「删除全部书库数据」，
+# 则清除数据库、配置、日志及上传的书库文件（书籍/封面/有声书）。
+#
+# 数据目录约定（见 README）：
+#   TRIM_PKGVAR   /vol*/@appdata/moyue   → moyue.db、JWT 密钥、日志
+#   TRIM_PKGETC   /vol*/@appconf/moyue   → 只读配置 config.yaml
+#   TRIM_APPSHARE /vol*/@appshare/moyue  → 上传文件 uploads/
+# 注：程序安装目录（TRIM_APPDEST）由飞牛在卸载末尾自动移除，此处不处理。
+set -u
+
+if [ "${wizard_data_action:-keep}" = "delete" ]; then
+  [ -n "${TRIM_PKGVAR:-}" ]   && rm -rf "${TRIM_PKGVAR}"
+  [ -n "${TRIM_PKGETC:-}" ]   && rm -rf "${TRIM_PKGETC}"
+  [ -n "${TRIM_APPSHARE:-}" ] && rm -rf "${TRIM_APPSHARE}"
+fi
+
+exit 0

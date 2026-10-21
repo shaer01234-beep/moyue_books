@@ -1,0 +1,35 @@
+#!/bin/bash
+# 配置变更（如端口）后：更新端口配置与桌面入口，然后重启服务
+# fnOS 在用户修改应用设置（wizard_port）后调用本脚本，并注入对应环境变量
+set -u
+
+PKG_VAR="${TRIM_PKGVAR}"
+APP_DEST="${TRIM_APPDEST}"
+CMD_DIR="$(cd "$(dirname "$0")" && pwd)"
+PORT_FILE="${PKG_VAR}/port.conf"
+LOG_FILE="${PKG_VAR}/info.log"
+NEW_PORT="${wizard_port:-}"
+
+# 端口校验：仅允许 2~5 位数字
+if [ -n "${NEW_PORT}" ]; then
+  case "${NEW_PORT}" in
+    ''|*[!0-9]*) NEW_PORT="";;
+  esac
+fi
+
+if [ -n "${NEW_PORT}" ]; then
+  echo "${NEW_PORT}" > "${PORT_FILE}"
+  # 桌面入口端口同步：与 onvif 一致，用固定路径覆盖飞牛实际使用的 ui/config，
+  # 替换 ${wizard_port} 占位符（旧写法）与固定端口两种形式
+  for f in "${TRIM_APPDEST}/ui/config" "${TRIM_APPDEST}/app/ui/config" "/var/apps/${TRIM_APPNAME:-moyue}/ui/config"; do
+    [ -f "$f" ] || continue
+    sed -E -i.bak -e 's|\$\{wizard_port\}|'"${NEW_PORT}"'|g' \
+                  -e 's|"port": *"[0-9]+"|"port": "'"${NEW_PORT}"'"|g' "$f" && rm -f "$f.bak"
+  done
+  echo "$(date '+%F %T') - 端口已更新为 ${NEW_PORT}" >> "${LOG_FILE}" 2>/dev/null || true
+fi
+
+# 重启服务使新端口生效（cmd/main 启动时会优先读取 port.conf）
+"${CMD_DIR}/main" stop >/dev/null 2>&1 || true
+"${CMD_DIR}/main" start >/dev/null 2>&1 || true
+exit 0
