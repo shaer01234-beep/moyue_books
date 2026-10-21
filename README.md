@@ -1,118 +1,133 @@
-# 个人图书管理系统
+# moyue-books（墨月图书）
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-基于 **Go + Gin + GORM + SQLite** 后端和 **Vue 3 + Element Plus + Vite** 前端构建的现代化个人图书管理应用。
+一个基于 **Go + Gin + GORM + SQLite** 后端和 **Vue 3 + Element Plus + Vite** 前端的现代化个人图书管理与阅读应用。支持多种电子书格式上传、自动元数据识别、在线阅读、阅读进度同步，以及基于云端 / 本地引擎的语音合成（TTS）与有声书生成。
 
 > 本项目以 **MIT 协议** 开源，欢迎 Fork、自部署与二次开发。详见 [LICENSE](LICENSE) 与 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
-## 功能特性（已实现）
+## 功能特性
 
-### P0 - 核心功能
-- [x] **图书上传**：支持拖拽上传，批量导入
-- [x] **格式支持**：EPUB、KEPUB、MOBI、AZW3、AZW、PDF、CBZ、CBR、M4B、MP3，以及 Markdown(.md) / 纯文本(.txt)（上传或扫描时自动转为 EPUB，按一级标题拆分为多章节，并自动生成主题色封面）
-- [x] **自动元数据识别**：从 EPUB OPF 文件提取书名、作者、出版社、语言、ISBN
-- [x] **文件名智能解析**：从文件名提取书名和作者
-- [x] **图书 CRUD**：编辑书名、作者、标签、封面；删除图书
-- [x] **书架视图**：网格/列表双视图，支持搜索、排序、分页
-- [x] **在线阅读器**：EPUB 阅读支持，目录导航、翻页、进度条
-- [x] **阅读进度保存**：自动保存当前章节和百分比进度
-- [x] **阅读统计**：藏书总数、正在阅读、已读完、总页数
+### 已实现（P0 核心）
 
-### P1 - 待实现
-- [ ] 划线和批注功能
+- **图书上传**：支持拖拽上传、批量导入。
+- **格式支持**：EPUB、KEPUB、MOBI、AZW3、AZW、PDF、CBZ、CBR、M4B、MP3，以及 Markdown（`.md`）/ 纯文本（`.txt`）。后两类在上传或扫描时自动转为 EPUB，按一级标题拆分为多章节，并自动生成主题色封面。
+- **自动元数据识别**：从 EPUB OPF 提取书名、作者、出版社、语言、ISBN；并从文件名智能解析书名与作者。
+- **图书管理**：编辑书名、作者、标签、封面；删除图书。
+- **书架视图**：网格 / 列表双视图，支持搜索、排序、分页。
+- **在线阅读器**：EPUB 阅读，目录导航、翻页、进度条、阅读偏好设置。
+- **阅读进度保存**：自动保存当前章节与百分比进度。
+- **阅读统计**：藏书总数、正在阅读、已读完、总页数。
+
+### 规划中（P1 / P2）
+
+- [ ] 划线、批注功能
 - [ ] 收藏夹管理
-- [ ] 高级搜索和筛选
-- [ ] 导出/导入备份
+- [ ] 高级搜索与筛选
+- [ ] 导出 / 导入备份
 - [ ] PDF 在线阅读
-
-### P2/P3 - 未来扩展
 - [ ] 在线元数据获取（豆瓣、Google Books）
-- [ ] 阅读统计和年度报告
-- [ ] 移动端适配优化
-- [ ] 云同步
+- [ ] 阅读统计与年度报告
+- [ ] 移动端适配优化、云同步
 
 ## 技术栈
 
 | 层级 | 技术 |
 |------|------|
-| 后端 | Go 1.17, Gin, GORM, SQLite3 |
-| 前端 | Vue 3, Element Plus, Vite, Axios |
-| 数据库 | SQLite3（零配置，本地存储）|
+| 后端 | Go、Gin、GORM、glebarez/sqlite（纯 Go SQLite）、difyz9/edge-tts-go |
+| 前端 | Vue 3、Element Plus、Vite、Axios、foliate-js、pdfjs-dist |
+| 数据库 | SQLite（零配置，本地文件存储） |
+| 部署 | 单二进制（前端经 `go:embed` 内嵌），支持飞牛 fnOS 打包 |
 
 ## 目录结构
 
 ```
-my-books/
-├── backend/              # Go 后端（可独立开发/调试/打包）
-│   ├── config/           # 配置加载与数据库初始化
-│   │   ├── config.go     # 配置文件 + 环境变量 + fpk 目录探测
-│   │   └── db.go         # SQLite 初始化
-│   ├── config.yaml.example   # 配置文件模板（位于 backend/ 根目录）
-│   ├── data/             # 数据目录（数据库 + 上传文件）
-│   │   ├── moyue.db    # SQLite 数据库
-│   │   ├── jwt_secret    # JWT 签名密钥
-│   │   └── uploads/      # 上传文件存储
-│   │       ├── books/    # 图书文件
-│   │       ├── covers/   # 封面图片
-│   │       └── temp/     # 临时文件
-│   ├── handlers/         # HTTP 处理器
-│   ├── models/           # 数据模型
-│   ├── routes/           # 路由配置
-│   ├── services/         # 业务逻辑（元数据提取、EPUB 解析）
-│   ├── utils/            # 工具函数
-│   └── main.go           # 入口文件
-├── frontend/             # Vue 3 前端
+moyue-books/
+├── backend/                 # Go 后端（独立 Go 模块，可单独开发 / 调试 / 打包）
+│   ├── cmd/                 # 辅助命令行工具
+│   ├── config/              # 配置加载与数据库初始化
+│   ├── handlers/            # HTTP 处理器
+│   ├── html/                # 前端产物内嵌（embed.go + dist/，dist 由构建生成）
+│   ├── logger/              # 日志组件
+│   ├── middleware/          # 中间件（鉴权、访问日志等）
+│   ├── models/              # 数据模型
+│   ├── routes/              # 路由配置
+│   ├── services/            # 业务逻辑（元数据提取、EPUB 解析、TTS 等）
+│   ├── utils/               # 工具函数
+│   ├── config.yaml.example  # 配置文件模板
+│   ├── go.mod / go.sum
+│   └── main.go              # 入口
+├── frontend/                # Vue 3 前端
+│   ├── public/              # 静态资源（pdf.worker、群二维码等）
 │   ├── src/
-│   │   ├── api/          # API 封装
-│   │   ├── views/        # 页面组件
-│   │   ├── router/       # 路由配置
-│   │   └── App.vue       # 根组件
+│   │   ├── api/             # API 封装
+│   │   ├── components/      # 公共组件
+│   │   ├── composables/     # 组合式函数
+│   │   ├── player/          # 播放器逻辑
+│   │   ├── router/          # 前端路由
+│   │   ├── styles/          # 样式
+│   │   ├── utils/           # 工具函数
+│   │   ├── views/           # 页面组件
+│   │   ├── App.vue
+│   │   ├── config.js
+│   │   ├── main.js
+│   │   └── polyfills.js
+│   ├── capacitor.config.json
+│   ├── index.html
 │   ├── package.json
 │   └── vite.config.js
+├── build.sh                 # 一键构建（前端 → 同步 → Go 编译）
+├── start.sh                 # 本地一键启动（后端 + 前端开发服务器）
+├── LICENSE
+├── CONTRIBUTING.md
 └── README.md
 ```
 
-## 快速启动
+## 快速开始
 
 ### 前置要求
-- Go 1.17+
-- Node.js 18+
-- macOS / Linux / Windows
 
-### 1. 生产构建（前端内嵌进二进制，单文件部署）
+- Go 1.21+（首次构建会自动拉取 1.25 工具链）
+- Node.js 18+
+- 操作系统：macOS / Linux / Windows
+
+### 一键构建与运行（生产）
 
 ```bash
 ./build.sh
 ./backend/moyue-server
 ```
 
-`build.sh` 会依次：构建前端（vite build）→ 将产物同步到 `backend/html/dist` → Go 编译。
-前端资源通过 `go:embed` 内嵌进 `backend/moyue-server` 单个二进制，无需再部署静态文件。
-后端默认运行在 `http://localhost:18080`，直接访问即可打开前端页面。
+`build.sh` 会依次执行：构建前端（`vite build`）→ 将产物同步到 `backend/html/dist` → 编译 Go 二进制。前端资源通过 `go:embed` 内嵌进 `backend/moyue-server` 单个二进制，无需额外部署静态文件。后端默认运行在 `http://localhost:18080`，直接访问即可打开前端页面。
 
-### 2. 配置文件（可选）
+### 配置文件（可选）
 
-复制 `backend/config.yaml.example` 为 `backend/config.yaml`（backend 项目根目录，与二进制同目录），可自定义端口、数据目录等：
+复制模板为本地配置（位于 `backend/` 根目录，与二进制同目录）：
+
+```bash
+cp backend/config.yaml.example backend/config.yaml
+```
 
 ```yaml
 server:
   port: 18080
+  log_level: info          # debug / info / warn / error
 data:
-  data_dir: ""       # 数据目录，默认 backend/data/（fpk 环境为 $TRIM_PKGVAR）
-  upload_dir: ""     # 上传目录，默认 <data_dir>/uploads
-  db_path: ""        # 数据库，默认 <data_dir>/moyue.db
+  data_dir: ""             # 数据目录，默认 backend/data/（飞牛环境为 $TRIM_PKGVAR）
+  upload_dir: ""           # 上传目录，默认 <data_dir>/uploads
+  db_path: ""              # 数据库，默认 <data_dir>/moyue.db
+  jwt_secret_path: ""      # JWT 签名密钥文件，默认 <data_dir>/jwt_secret
 ```
 
-所有配置项均可用环境变量覆盖：`MB_DATA_DIR`、`MB_UPLOAD_DIR`、`MB_DB_PATH`、`MB_JWT_SECRET`、`PORT`。
-配置文件查找顺序：`MB_CONFIG` > `$TRIM_PKGETC/config.yaml` > `/app/config/config.yaml` > `backend/config.yaml`（backend 独立运行时默认读取）。
+所有配置项均可用环境变量覆盖（见下文「配置说明」）。配置文件查找顺序：
+`MB_CONFIG` > `$TRIM_PKGETC/config.yaml` > `/app/config/config.yaml` > `backend/config.yaml`。
 
-### 2.1 单独运行 backend（独立开发/调试）
+### 开发模式
 
-backend 目录本身即一个完整的 Go 项目（含 `go.mod`），可脱离前端独立运行：
+启动后端（独立调试）：
 
 ```bash
-# 前端资源通过 go:embed 内嵌，单独编译 backend 前需先生成前端产物：
+# 前端资源经 go:embed 内嵌，单独编译 backend 前需先生成前端产物：
 cd frontend && npm install && npm run build && cp -r dist ../backend/html/dist
 
 cd backend
@@ -120,45 +135,47 @@ CGO_ENABLED=1 go build -o moyue-server .
 ./moyue-server
 ```
 
-- 数据目录自动定位到 `backend/data/`（数据库、JWT 密钥、上传文件）
-- 自动读取 `backend/config.yaml`（存在时）
-- 不依赖工作目录、不依赖仓库根目录，任意位置启动结果一致
-- 也可直接执行仓库根的 `./build.sh` 一步完成「构建前端 → 同步 → 编译二进制」
+或直接用 `start.sh` 一键启动后端与前端开发服务器（热更新，前端运行在 `http://localhost:3000`，已配置代理到后端 API）。
 
-### 3. 启动前端（开发模式，热更新）
+### 飞牛 fnOS（fnpk）部署
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
+后端已按飞牛 fpk 应用的目录约定设计，打包为 fpk 应用时无需修改代码。路径与环境变量约定如下：
 
-前端开发服务器运行在 `http://localhost:3000`，已配置代理到后端 API。
+| 内容 | 环境变量 | 说明 |
+|------|----------|------|
+| 程序（单二进制，前端已内嵌） | `TRIM_APPDEST` | `moyue-server` |
+| 静态配置（只读） | `TRIM_PKGETC` | 放置 `config.yaml`，自动读取 |
+| 运行时数据（持久化，卸载保留） | `TRIM_PKGVAR` | 数据库 `moyue.db`、JWT 密钥存放于此 |
+| 用户共享数据 | `TRIM_APPSHARE` | 上传文件默认存放于 `$TRIM_APPSHARE/uploads` |
 
-### 4. 访问应用
+用户可在飞牛「应用管理」中修改服务端口，系统以 `TRIM_SERVICE_PORT` 注入并自动生效（优先级：`TRIM_SERVICE_PORT` > `PORT` > 配置文件 > 18080）。
 
-打开浏览器访问 http://localhost:3000 即可使用（生产模式直接访问 http://localhost:18080）。
+## 配置说明
 
-### 5. 飞牛 fnOS（fpk 应用）打包兼容
+除 `config.yaml` 外，以下环境变量均可覆盖对应配置：
 
-后端已按飞牛 fpk 应用的目录约定设计，打包为 fpk 应用时无需修改代码。打包骨架见 `backend/fpk/`（manifest + 启动脚本 + 构建说明）：
+| 环境变量 | 作用 |
+|----------|------|
+| `MB_CONFIG` | 指定配置文件路径（最高优先级） |
+| `MB_DATA_DIR` | 数据目录 |
+| `MB_UPLOAD_DIR` | 上传目录 |
+| `MB_DB_PATH` | 数据库文件路径 |
+| `MB_JWT_SECRET` | JWT 签名密钥（环境变量优先于密钥文件） |
+| `PORT` | 服务监听端口 |
+| `EDGE_TTS_PROXY` | Edge TTS 代理地址（受限网络出网用） |
+| `HTTPS_PROXY` | 通用 HTTPS 代理（Edge TTS 亦可经此出网） |
+| `FEEDBACK_MAIL_ACCOUNT` | 反馈邮件通道的 163 邮箱账号 |
+| `FEEDBACK_MAIL_AUTH` | 反馈邮件通道的 163 SMTP 授权码 |
 
-**用户可自定义服务端口**：`manifest` 中 `service_port` 定义默认端口，用户在飞牛"应用管理"界面可修改端口映射，系统以 `TRIM_SERVICE_PORT` 注入，后端自动生效（优先级：`TRIM_SERVICE_PORT` > `PORT` > 配置文件 > 18080）。
-
-| 内容 | 开发目录 | 安装后目录 | 环境变量 | 说明 |
-|------|---------|-----------|---------|------|
-| 程序（单二进制，前端已内嵌） | `app/` | `target/` | `TRIM_APPDEST` | `moyue-server` |
-| 静态配置（只读） | `etc/` | `etc/` | `TRIM_PKGETC` | 放置 `config.yaml`，自动读取 |
-| 运行时数据（持久化，卸载保留） | `var/` | `var/` | `TRIM_PKGVAR` | 数据库 `moyue.db`、JWT 密钥存放于此 |
-| 用户共享数据 | `shares/` | `shares/` | `TRIM_APPSHARE` | 上传文件默认存放于 `$TRIM_APPSHARE/uploads`，可在飞牛"文件管理"直接访问 |
-
-路径优先级规则：
-- 配置路径：`MB_CONFIG` > `$TRIM_PKGETC/config.yaml` > `/app/config/config.yaml`（旧约定）> `backend/config.yaml`
-- 数据目录：`MB_DATA_DIR` > 配置文件 `data_dir` > `$TRIM_PKGVAR` > `/app/data`（旧约定）> `backend/data`
+路径解析优先级：
+- 配置路径：`MB_CONFIG` > `$TRIM_PKGETC/config.yaml` > `/app/config/config.yaml` > `backend/config.yaml`
+- 数据目录：`MB_DATA_DIR` > 配置文件 `data_dir` > `$TRIM_PKGVAR` > `/app/data` > `backend/data`
 - 上传目录：`MB_UPLOAD_DIR` > 配置文件 `upload_dir` > `$TRIM_APPSHARE/uploads`（飞牛环境）> `数据目录/uploads`
 - 数据库默认 `数据目录/moyue.db`；上传目录（含 `books/covers/temp` 子目录）首次启动自动创建
 
-## API 接口文档
+> 数据与备份：图书文件存于 `backend/data/uploads/books/`，封面存于 `backend/data/uploads/covers/`，数据库位于 `backend/data/moyue.db`。备份整个 `backend/data/` 目录即可完整迁移。
+
+## API 接口
 
 | 方法 | 路径 | 说明 |
 |------|------|------|
@@ -169,52 +186,42 @@ npm run dev
 | PUT | `/api/books/:id` | 更新图书信息 |
 | DELETE | `/api/books/:id` | 删除图书 |
 | GET | `/api/books/:id/cover` | 获取封面 |
-| POST | `/api/books/:id/cover` | 上传/更换封面 |
+| POST | `/api/books/:id/cover` | 上传 / 更换封面 |
 | PUT | `/api/books/:id/progress` | 更新阅读进度 |
-| GET | `/api/books/:id/content` | 获取 EPUB 目录/章节内容 |
+| GET | `/api/books/:id/content` | 获取 EPUB 目录 / 章节内容 |
 | GET | `/api/books/:id/download` | 下载原文件 |
 | GET | `/api/stats` | 统计信息 |
 
 ## 使用说明
 
 ### 导入图书
-1. 点击左侧导航栏「导入图书」
-2. 拖拽文件到上传区域，或点击选择文件
-3. 支持批量选择多个文件同时上传
-4. 系统会自动提取 EPUB 元数据（书名、作者、出版社等）
+1. 点击左侧导航栏「导入图书」。
+2. 拖拽文件到上传区域，或点击选择文件（支持批量）。
+3. 系统会自动提取 EPUB 元数据（书名、作者、出版社等）。
 
 ### 浏览书架
-1. 点击「书架」进入图书列表
-2. 切换网格/列表视图
-3. 支持按时间、书名、最近阅读排序
-4. 顶部搜索栏可按书名/作者搜索
+1. 点击「书架」进入图书列表。
+2. 切换网格 / 列表视图。
+3. 支持按时间、书名、最近阅读排序；顶部搜索栏可按书名 / 作者搜索。
 
 ### 阅读图书
-1. 点击图书卡片或「阅读」按钮进入阅读器
-2. 点击屏幕左右边缘翻页
-3. 使用键盘 ← → 方向键翻页
-4. 点击「目录」打开章节导航
-5. 点击「设置」调整字体、字号、行距、主题
-6. 退出时自动保存阅读进度
+1. 点击图书卡片或「阅读」按钮进入阅读器。
+2. 点击屏幕左右边缘或按键盘 ← → 翻页。
+3. 点击「目录」打开章节导航；点击「设置」调整字体、字号、行距、主题。
+4. 退出时自动保存阅读进度。
 
 ### 编辑图书信息
-1. 在书架或详情页点击「编辑」
-2. 修改书名、作者（逗号分隔）、出版社、描述、标签
-3. 支持更换封面图片
+1. 在书架或详情页点击「编辑」。
+2. 修改书名、作者（逗号分隔）、出版社、描述、标签。
+3. 支持更换封面图片。
 
-## 注意事项
-
-- 图书文件存储在 `backend/data/uploads/books/`，封面存储在 `backend/data/uploads/covers/`
-- 数据库为 SQLite，位于 `backend/data/moyue.db`，可随时备份整个 `backend/data/` 目录
-- `backend/data/` 为独立项目的运行时数据目录，后端二进制可随目录整体迁移部署
-- PDF 格式暂不支持在线阅读，可通过详情页下载后阅读
-- 首次启动会自动创建数据库表结构与数据目录
+> 注：PDF 格式暂不支持在线阅读，可通过详情页下载后阅读。
 
 ## 语音合成（TTS）配置
 
 应用内置多种语音合成引擎，用于在线阅读朗读与有声书生成：
 
-- **Edge TTS（云端，免费）**：微软在线语音，无需本地模型，默认开启。后端已改用 Go 原生库直连微软端点，**不再依赖 Python tts-service**，并在收到 403 时依据服务端时间自动校正本地时钟偏移并重试。
+- **Edge TTS（云端，免费）**：微软在线语音，无需本地模型，默认开启。后端使用 Go 原生库直连微软端点，**不依赖 Python tts-service**，并在收到 403 时依据服务端时间自动校正本地时钟偏移并重试。
 - **GPT-SoVITS / Fish-Speech / ChatTTS（本地部署）**：声音克隆或本地模型，需在 `tts.base_url` 配置自托管服务地址。
 
 ### 受限网络（403）代理配置
@@ -223,7 +230,7 @@ npm run dev
 
 1. **代理出网（推荐）**：在启动后端的环境中设置以下环境变量之一，后端会经代理连接微软：
    ```bash
-   export EDGE_TTS_PROXY="http://127.0.0.1:7890"   # 优先（与 tts-service 取值一致）
+   export EDGE_TTS_PROXY="http://127.0.0.1:7890"   # 优先
    # 或通用代理（二选一）
    export HTTPS_PROXY="http://127.0.0.1:7890"
    ```
@@ -245,14 +252,15 @@ export FEEDBACK_MAIL_AUTH="your_smtp_auth_code"   # 163 SMTP 授权码（非登�
 
 ## 开发计划
 
-当前完成度约 **60%**（P0 核心功能已全部实现）。如需继续开发 P1/P2 功能（批注、收藏夹、PDF 阅读器、阅读统计等），可在此代码基础上扩展。
+当前完成度约 **60%**（P0 核心功能已全部实现）。如需继续开发 P1/P2 功能（批注、收藏夹、PDF 阅读器、阅读统计等），可在此代码基础上扩展。欢迎通过 Issue 与 Pull Request 参与贡献。
+
+## 贡献
+
+欢迎参与贡献！提交 Issue、提出建议或发起 Pull Request 前，请先阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
 ## 开源许可证
 
-本项目基于 **[MIT 许可证](LICENSE)** 发布。你可以自由地使用、修改、分发本软件（包括商业用途），
-只需在副本中保留原始版权声明与许可声明。软件按「原样」提供，作者不承担任何担保或责任。
-
-欢迎通过 Issue 与 Pull Request 参与贡献，详见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+本项目基于 **[MIT 许可证](LICENSE)** 发布。你可以自由地使用、修改、分发本软件（包括商业用途），只需在副本中保留原始版权声明与许可声明。软件按「原样」提供，作者不承担任何担保或责任。
 
 ## 致谢与依赖
 
